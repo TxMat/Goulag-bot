@@ -5,6 +5,7 @@ from time import sleep, time
 from json import load as json_load
 from discord.utils import get
 from random import randrange
+
 print(discord.__version__)
 
 with open("config.json") as f:
@@ -18,6 +19,7 @@ global ids
 global idmute
 global me
 no = '❌'
+log = False
 me = 0
 ids = 0
 idmute = 0
@@ -44,8 +46,6 @@ async def change_presence(message, *args):
     print(str(log))
 
 
-
-
 async def mutee(message, *args):
     global idmute
     idmute = int(args[0])
@@ -70,7 +70,6 @@ async def mutee(message, *args):
 
 
 async def unmutee(message, *args):
-    
     global muted
     await client.get_user(259676097652719616).dm_channel.send(muted)
     idmute = args[0]
@@ -82,7 +81,7 @@ async def unmutee(message, *args):
             return
         await message.add_reaction("👌")
     finally:
-        if idmute not in muted:
+        if idmute not in muted and idmute != 'all':
             await message.add_reaction("❔")
             return
         if idmute in muted:
@@ -92,7 +91,6 @@ async def unmutee(message, *args):
 
 
 async def sayy(message, *args):
-    
     ch = int(args[0])
     mss = " ".join(args[1:])
     channel = client.get_channel(ch)
@@ -109,6 +107,7 @@ async def helpp(message, *args):
     )
     await message.add_reaction(OPTIONS[message.channel.guild.id]["emoji"])
 
+
 async def createe(message, *args):
     if args[0] not in custom_cmd:
         custom_cmd.append(args[0])
@@ -118,6 +117,8 @@ async def createe(message, *args):
         await message.add_reaction(OPTIONS[message.channel.guild.id]["emoji"])
     else:
         await message.add_reaction(no)
+
+
 #    mss = " ".join(args[1:])
 #    if mss != "":
 #        await addd(message)
@@ -130,6 +131,7 @@ async def addd(message, *args):
     print(CustomStrings[args[0]])
     return
 
+
 async def custom(message, *args):
     print(args)
     if args[0] not in custom_cmd:
@@ -138,11 +140,15 @@ async def custom(message, *args):
     rand = randrange(tot)
     await message.channel.send((CustomStrings[args[0]][rand]))
 
+
 async def removee(message, *args):
     if args[0] in custom_cmd:
+        await message.add_reaction(OPTIONS[message.channel.guild.id]["emoji"])
         await message.channel.send(args[0] + " Supprimée :c")
     else:
         await message.add_reaction(no)
+
+
 actions = {
     "option": option,
     "desc": change_presence,
@@ -150,14 +156,15 @@ actions = {
     "mute": mutee,
     "say": sayy,
     "unmute": unmutee,
-    "create" : createe,
-    "add" : addd
+    "create": createe,
+    "add": addd,
+    "delete": removee
 }
 
 perm_actions = ["option", "mute", "unmute"]
 admin_actions = ["desc", "say"]
 badwords = [
-    "tg", "ntm","pd", "fdp","suce", "ftg"
+    "tg", "ntm", "pd", "fdp", "suce", "ftg"
 ]
 muted = []
 custom_cmd = []
@@ -223,7 +230,7 @@ async def on_message(message):
         if a[0] in perm_actions and (
                 message.author.guild_permissions.manage_guild == False
                 and OPTIONS[message.channel.guild.id]["role"] not in list(
-                    map(lambda x: x.name, message.author.roles))):
+            map(lambda x: x.name, message.author.roles))):
             log = "no perms nice try ", message.author
             print(log)
             await message.add_reaction("❌")
@@ -251,6 +258,7 @@ async def on_ready():
 @client.event
 async def on_guild_join(guild):
     OPTIONS[guild.id] = dict(DEFAULT)
+
 
 # keep_live()
 client.run(CONFIG["token"])
