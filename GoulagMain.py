@@ -4,6 +4,7 @@ import asyncio
 from time import sleep, time
 from json import load as json_load
 from discord.utils import get
+from random import randrange
 print(discord.__version__)
 
 with open("config.json") as f:
@@ -16,6 +17,7 @@ global chat
 global ids
 global idmute
 global me
+no = '❌'
 me = 0
 ids = 0
 idmute = 0
@@ -110,8 +112,12 @@ async def helpp(message, *args):
 async def createe(message, *args):
     if args[0] not in custom_cmd:
         custom_cmd.append(args[0])
-        print(args[0] + "ajouté a la liste des commandes")
+        print(args[0] + " ajouté a la liste des commandes")
+        CustomStrings[args[0]] = []
+        print(custom_cmd)
         await message.add_reaction(OPTIONS[message.channel.guild.id]["emoji"])
+    else:
+        await message.add_reaction(no)
 #    mss = " ".join(args[1:])
 #    if mss != "":
 #        await addd(message)
@@ -119,18 +125,24 @@ async def createe(message, *args):
 async def addd(message, *args):
     if args[0] not in custom_cmd:
         return
-    CustomStrings[args[0]] = " ".join(args[1:])
+    CustomStrings[args[0]].append(" ".join(args[1:]))
     print(CustomStrings)
+    print(CustomStrings[args[0]])
     return
 
 async def custom(message, *args):
+    print(args)
     if args[0] not in custom_cmd:
         return
-    for x in CustomStrings:
-        if
+    tot = len(CustomStrings[args[0]])
+    rand = randrange(tot)
+    await message.channel.send((CustomStrings[args[0]][rand]))
 
-
-
+async def removee(message, *args):
+    if args[0] in custom_cmd:
+        await message.channel.send(args[0] + " Supprimée :c")
+    else:
+        await message.add_reaction(no)
 actions = {
     "option": option,
     "desc": change_presence,
@@ -141,6 +153,7 @@ actions = {
     "create" : createe,
     "add" : addd
 }
+
 perm_actions = ["option", "mute", "unmute"]
 admin_actions = ["desc", "say"]
 badwords = [
@@ -196,7 +209,8 @@ async def on_message(message):
         return
     if len(message.content) and message.content[0] == OPTIONS[message.guild.id]["prefix"]:
         a = message.content[1:].split(" ")
-        if a[0] not in actions:
+        print(a[0])
+        if a[0] not in actions and a[0] not in custom_cmd:
             log = "wrong command:", message.content, "by :", message.author
             print(log)
             await message.add_reaction("❔")
@@ -217,10 +231,11 @@ async def on_message(message):
                 message.author.roles)
             return
         if a[0] in custom_cmd:
-            await custom(message, *a[1:])
+            await custom(message, *a[0:])
+        else:
+            await actions[a[0]](message, *a[1:])
         log = "executing command:", message.content, "by :", message.author
         print(log)
-        await actions[a[0]](message, *a[1:])
 
 
 @client.event
