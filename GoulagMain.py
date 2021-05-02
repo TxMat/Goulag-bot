@@ -112,7 +112,7 @@ async def helpp(message, *args):
     mem = message.author
     await mem.create_dm()
     await mem.dm_channel.send(
-        "xd"
+        "__**command list:**__ \n\n**option prefix :** permet de changer le préfix du bot (& par défaut)\n\n**help :** envoie ce message à l'utilisateur qui effectue la commande\n\n**option emoji :** l'emoji avec le quel le bot réagit quand une personne fait <préfix>help (par défaut : :ok_hand:)\n\n**create :** va creer une commande (le nom doit etre contenu en un mot &create vive hitler ne va pas marcher utilisez create vive_hitler a la place)\n\n**add :** ajoute un phrase qui sera choisie aleatoirement a chaque appel de la commande custom (utilisation &add <name> <phrase>)\n\n**option role :** nom du role qu'un membre doit posséder pour modifier les differents parametres (`modifier` par défaut)\n\n**remove :** supprime une commande sans confirmation (ouais je vais changer ca tkt)\n\n**list :** envoie la liste des toutes les commandes custom (recommandé pour les sauvegarder)\n\n**clear :** supprime toutes les commandes custom du serveur\n\n ```note : il vous faut la permission `gerer le serveur` ou le role defini par <role> pour parametrer le bot (mais pas pour ajouter des commandes ouais c'est pt je vais changer tkt)```\n\n`Une question/sugestion? contactez mon devloppeur : `<@259676097652719616>` :)`\n\n*Ver : BETA0.7*"
     )
     await message.add_reaction(OPTIONS[message.channel.guild.id]["emoji"])
 
@@ -170,10 +170,10 @@ async def clearr(message, *args):
   await message.channel.send("tape 'tkt je gère' pour effectuer la commande")
   await message.channel.send("(ps : t'a 10 sec pour te decider)")
   msg = await client.wait_for('message', check=check(message.author), timeout=10)
-  if msg == "tkt je gère":
+  if msg.content == "tkt je gère":
     custom_cmd = []
     CustomStrings = {}
-    await message.channel.send("c'est reset")
+    await message.channel.send("Reset effectué")
   else:
     await message.channel.send("Annulé")
 
@@ -214,7 +214,7 @@ CustomStrings = {}
 @client.event
 async def on_message(message):
     if type(message.channel) != discord.TextChannel:
-        if message.author.id == 697343120433741947:
+        if message.author.id == 838037358854012938:
             return
         '''
         if len(message.content) and message.content[0] == "&":
