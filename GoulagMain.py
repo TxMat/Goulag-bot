@@ -1,6 +1,6 @@
 import discord
 import asyncio
-# from keep_live import keep_live
+from keep_live import keep_live
 from time import sleep, time
 from json import load as json_load
 from discord.utils import get
@@ -99,6 +99,15 @@ async def sayy(message, *args):
     return
 
 
+def check(author):
+    def inner_check(message):
+        if message.author != author:
+            return False
+        else:
+          return True
+    return inner_check
+
+
 async def helpp(message, *args):
     mem = message.author
     await mem.create_dm()
@@ -125,10 +134,25 @@ async def createe(message, *args):
 
 async def addd(message, *args):
     if args[0] not in custom_cmd:
+        await message.add_reaction(no)
         return
     CustomStrings[args[0]].append(" ".join(args[1:]))
     print(CustomStrings)
     print(CustomStrings[args[0]])
+    await message.add_reaction(OPTIONS[message.channel.guild.id]["emoji"])
+    return
+
+
+async def listt(message, *args):
+    mss = ""
+    for i in CustomStrings.keys():
+        mss = mss + "**" + i + " :" + "**" + "\n\n"
+        for j in CustomStrings[i]:
+            print(j)
+            mss = mss + " - " + j + "\n"
+        mss = mss + "\n\n" + "------------------------------------------------" + "\n\n"
+    await message.author.create_dm()
+    await message.author.dm_channel.send(mss)
     return
 
 
@@ -141,10 +165,24 @@ async def custom(message, *args):
     await message.channel.send((CustomStrings[args[0]][rand]))
 
 
+async def clearr(message, *args):
+  await message.channel.send("ATTENTION CETTE COMMANDE VA SUPPRIMER **TOUTES** VOS COMMANDES CUSTOMS")
+  await message.channel.send("tape 'tkt je gère' pour effectuer la commande")
+  await message.channel.send("(ps : t'a 10 sec pour te decider)")
+  msg = await client.wait_for('message', check=check(message.author), timeout=10)
+  if msg == "tkt je gère":
+    custom_cmd = []
+    CustomStrings = {}
+    await message.channel.send("c'est reset")
+  else:
+    await message.channel.send("Annulé")
+
+
+
 async def removee(message, *args):
     if args[0] in custom_cmd:
         await message.add_reaction(OPTIONS[message.channel.guild.id]["emoji"])
-        await message.channel.send(args[0] + " Supprimée :c")
+        await message.channel.send(args[0] + " Supprimé(e) :c")
     else:
         await message.add_reaction(no)
 
@@ -158,7 +196,9 @@ actions = {
     "unmute": unmutee,
     "create": createe,
     "add": addd,
-    "delete": removee
+    "delete": removee,
+    "list": listt,
+    "clear" : clearr
 }
 
 perm_actions = ["option", "mute", "unmute"]
@@ -260,5 +300,5 @@ async def on_guild_join(guild):
     OPTIONS[guild.id] = dict(DEFAULT)
 
 
-# keep_live()
+keep_live()
 client.run(CONFIG["token"])
