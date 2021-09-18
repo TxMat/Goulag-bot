@@ -1,6 +1,5 @@
 import discord
 import asyncio
-from keep_live import keep_live
 from time import sleep, time
 from json import load as json_load
 from random import randrange
@@ -321,5 +320,4 @@ async def on_guild_join(guild):
     OPTIONS[guild.id] = dict(DEFAULT)
 
 
-keep_live()
 client.run(CONFIG["token"])
