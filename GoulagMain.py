@@ -3,8 +3,9 @@ import asyncio
 from keep_live import keep_live
 from time import sleep, time
 from json import load as json_load
-from discord.utils import get
 from random import randrange
+from random import randint
+import time
 
 print(discord.__version__)
 
@@ -27,6 +28,7 @@ mute = False
 idbck = 0
 meid = 0
 memid = 0
+waitrep = False
 
 client = discord.Client()
 CHANNELS = {}
@@ -71,7 +73,6 @@ async def mutee(message, *args):
 
 async def unmutee(message, *args):
     global muted
-    await client.get_user(259676097652719616).dm_channel.send(muted)
     idmute = args[0]
     try:
         idmute = int(args[0])
@@ -100,7 +101,7 @@ async def sayy(message, *args):
 
 
 def check(author):
-    def inner_check(message):
+    def inner_check(message): 
         if message.author != author:
             return False
         else:
@@ -166,6 +167,8 @@ async def custom(message, *args):
 
 
 async def clearr(message, *args):
+  global custom_cmd
+  global CustomStrings
   await message.channel.send("ATTENTION CETTE COMMANDE VA SUPPRIMER **TOUTES** VOS COMMANDES CUSTOMS")
   await message.channel.send("tape 'tkt je gère' pour effectuer la commande")
   await message.channel.send("(ps : t'a 10 sec pour te decider)")
@@ -203,9 +206,25 @@ actions = {
 
 perm_actions = ["option", "mute", "unmute"]
 admin_actions = ["desc", "say"]
+
 badwords = [
-    "tg", "ntm", "pd", "fdp", "suce", "ftg"
+    "tg", "ntm", "pd", "fdp", "suce", "ftg", "salope", "encule", "enculé", "connard", "pute"
 ]
+
+reponses = [
+  "tu veux quoi enculé ?", "il y a un probleme fils de pute ?", "redis ca encore une fois je baise ta mere", "et ta soeur fdp ?", "nique tes morts non ?", "je te retoune le compliment fdp", "t'a pas autre chose a faire qu'insulter un bot en mp qui te reponds avec des reponses pré-enregistrés ?", "1v1 gare du nord enculé", "no u", "toi je note ton nom fait gaffe a ton cul la prochaine fois que tu join un voc", "parle mieux pd"
+]
+
+react = [
+  "wtf", "omg", "wow", "mdr", "xd", "hahaha", "😂", "😂😂", "😂😂😂"
+]
+
+rep2 = [
+  "on fait moins le malin mtn hein ?", "alors ca t'a calmé ?", "je prefere cette ambiance", "ouais ouais mefie toi je t'ai a l'oeil"
+]
+
+quoi = ["quoi", "quoi?", "quoi ?"]
+
 muted = []
 custom_cmd = []
 CustomStrings = {}
@@ -213,26 +232,25 @@ CustomStrings = {}
 
 @client.event
 async def on_message(message):
+    if message.author.id == 408785106942164992 or  message.author.id == 259676097652719616:
+      a = message.content[0:].split(" ")
+      if a[0] == "**⚠️":
+        print(a)
+        user = await client.fetch_user(259676097652719616)
+        await client.wait_until_ready()
+        await user.create_dm()
+        for i in range (10):
+          await message.channel.send(user.mention)
+          await user.dm_channel.send("OWO CAPTCHA EMERGENCY")
     if type(message.channel) != discord.TextChannel:
+        global waitrep
         if message.author.id == 838037358854012938:
             return
-        '''
-        if len(message.content) and message.content[0] == "&":
-            a = message.content[1:].split(" ")
-            if a[0] not in actions:
-                log = "wrong command:", message.content, "by :", message.author
-                print(log)
-                await message.add_reaction("❔")
-                return
-            if a[0] in admin_actions and message.author.id not in CONFIG["admins"]:
-                log = "wrong permission to use command:", message.content, "by :", message.author
-                print(log)
-                await message.add_reaction("❌")
-                return
-            log = "executing command:", message.content, "by :", message.author
-            print(log)
-            await actions[a[0]](message, *a[1:])
-        '''
+        if waitrep:
+          if message.content.lower() in react:
+            nb = randint(0, len(rep2))
+            await message.author.dm_channel.send(rep2[nb])
+          waitrep = False
         if message.content.lower() in badwords:
             if message.author.id == 328521363180748801:
                 log = "insult in dm :", message.content
@@ -240,12 +258,14 @@ async def on_message(message):
                 log = "by :", message.author
                 print(log)
                 return
-            await message.author.dm_channel.send(">:(")
+            nb = randint(0, len(reponses)-1)
+            await message.author.dm_channel.send(reponses[nb])
+            waitrep = True
             log = "insult in dm :", message.content
             print(log)
             log = "get trolled :", message.author
             print(log)
-            return
+            return 
         log = "dm ressage recived :", message.content
         print(log)
         log = "by :", message.author
@@ -274,8 +294,6 @@ async def on_message(message):
             log = "no perms nice try ", message.author
             print(log)
             await message.add_reaction("❌")
-            await client.get_user(259676097652719616).dm_channel.send(
-                message.author.roles)
             return
         if a[0] in custom_cmd:
             await custom(message, *a[0:])
@@ -283,6 +301,9 @@ async def on_message(message):
             await actions[a[0]](message, *a[1:])
         log = "executing command:", message.content, "by :", message.author
         print(log)
+    if message.content.lower() in quoi:
+      await message.channel.send("https://cdn.discordapp.com/attachments/691609589036220486/871044378691530793/FEUR.mp4")
+      return
 
 
 @client.event
