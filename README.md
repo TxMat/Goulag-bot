@@ -1,4 +1,2 @@
 # Goulag bot
-Rien de fou
-
-vraiment
+a custom bot made for a private server
